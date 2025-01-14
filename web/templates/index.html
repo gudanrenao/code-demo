@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{.title}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="app-header">
+            <h1><i class="material-icons">movie</i> 视频检测系统</h1>
+            <nav class="main-nav">
+                <a href="/tasks" class="nav-link">
+                    <i class="material-icons">list</i>
+                    <span>任务列表</span>
+                </a>
+            </nav>
+        </header>
+        
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+
+        <div class="tabs">
+            <button class="tab-button active" data-tab="detection">
+                <i class="material-icons">visibility</i>
+                <span>视频检测</span>
+            </button>
+            <button class="tab-button" data-tab="frames">
+                <i class="material-icons">collections</i>
+                <span>视频抽帧</span>
+            </button>
+        </div>
+
+        <div class="tab-content" id="detection-tab">
+            <div class="upload-section">
+                <form id="uploadForm" class="upload-form">
+                    <div class="file-input-wrapper">
+                        <label for="fileInput" class="file-label">
+                            <i class="material-icons">cloud_upload</i>
+                            <span>选择文件</span>
+                        </label>
+                        <input type="file" name="file" accept=".mp4,.mov,.flv,.avi,.wmv,.rmvb,.ts,.3gp,.jpg,.jpeg,.png">
+                    </div>
+                    <div class="upload-progress" style="display: none;">
+                        <div class="progress-bar">
+                            <div class="progress-bar-inner" style="width: 0%"></div>
+                        </div>
+                        <span class="progress-text">0%</span>
+                    </div>
+                    <button type="submit" class="primary-button">
+                        <i class="material-icons">file_upload</i>
+                        <span>上传</span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="detection-config">
+                <h2><i class="material-icons">settings</i> 检测配置</h2>
+                <form id="configForm">
+                    <div class="detection-types">
+                        <label class="section-label">检测类型：</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="types" value="black_screen">
+                                <span class="checkbox-custom"></span>
+                                黑屏检测
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="types" value="blue_screen">
+                                <span class="checkbox-custom"></span>
+                                蓝屏检测
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="types" value="green_screen">
+                                <span class="checkbox-custom"></span>
+                                绿屏检测
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="thresholds">
+                        <label class="section-label">检测阈值：</label>
+                        <div class="threshold-group">
+                            <div class="threshold-item">
+                                <label class="threshold-label">黑屏：</label>
+                                <input type="number" name="threshold_black_screen" min="0" max="1" step="0.1" value="0.1">
+                            </div>
+                            <div class="threshold-item">
+                                <label class="threshold-label">蓝屏：</label>
+                                <input type="number" name="threshold_blue_screen" min="0" max="1" step="0.1" value="0.6">
+                            </div>
+                            <div class="threshold-item">
+                                <label class="threshold-label">绿屏：</label>
+                                <input type="number" name="threshold_green_screen" min="0" max="1" step="0.1" value="0.6">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="tab-content" id="frames-tab" style="display: none;">
+            <div class="upload-section">
+                <form id="framesForm">
+                    <div class="file-input-wrapper">
+                        <label for="videoInput" class="file-label">
+                            <i class="material-icons">movie</i>
+                            <span>选择视频</span>
+                        </label>
+                        <input type="file" name="file" accept=".mp4,.mov,.flv,.avi,.wmv" id="videoInput">
+                    </div>
+                    
+                    <div id="videoInfo" class="video-info" style="display: none;">
+                        <h3><i class="material-icons">info</i> 视频信息</h3>
+                        <table>
+                            <tr>
+                                <th>时长</th>
+                                <td id="videoDuration">-</td>
+                            </tr>
+                            <tr>
+                                <th>帧率</th>
+                                <td id="videoFrameRate">-</td>
+                            </tr>
+                            <tr>
+                                <th>分辨率</th>
+                                <td id="videoResolution">-</td>
+                            </tr>
+                            <tr>
+                                <th>格式</th>
+                                <td id="videoFormat">-</td>
+                            </tr>
+                            <tr>
+                                <th>视频编码</th>
+                                <td id="videoCodec">-</td>
+                            </tr>
+                            <tr>
+                                <th>比特率</th>
+                                <td id="videoBitrate">-</td>
+                            </tr>
+                            <tr>
+                                <th>文件大小</th>
+                                <td id="videoSize">-</td>
+                            </tr>
+                            <tr>
+                                <th>音频编码</th>
+                                <td id="audioCodec">-</td>
+                            </tr>
+                            <tr>
+                                <th>音频通道</th>
+                                <td id="audioChannels">-</td>
+                            </tr>
+                            <tr>
+                                <th>采样率</th>
+                                <td id="audioSampleRate">-</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="frames-config">
+                        <h3><i class="material-icons">tune</i> 抽帧设置</h3>
+                        <div class="config-group">
+                            <label class="radio-label">
+                                <input type="radio" name="extractType" value="interval" checked>
+                                <span class="radio-custom"></span>
+                                按时间间隔抽帧
+                            </label>
+                            <input type="number" id="interval" value="1" min="0.1" step="0.1">
+                            <span>秒</span>
+                        </div>
+                        <div class="config-group">
+                            <label class="radio-label">
+                                <input type="radio" name="extractType" value="count">
+                                <span class="radio-custom"></span>
+                                按总帧数抽帧
+                            </label>
+                            <input type="number" id="frameCount" value="100" min="1" disabled>
+                            <span>帧</span>
+                        </div>
+                        <div class="form-group">
+                            <label>图片格式</label>
+                            <select id="imageFormat" name="imageFormat">
+                                <option value="jpg">JPG</option>
+                                <option value="png">PNG</option>
+                                <option value="webp">WebP</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="upload-progress" style="display: none;">
+                        <div class="progress-bar">
+                            <div class="progress-bar-inner" style="width: 0%"></div>
+                        </div>
+                        <span class="progress-text">0%</span>
+                    </div>
+                    <button type="submit" class="primary-button">
+                        <i class="material-icons">content_cut</i>
+                        <span>开始抽帧</span>
+                    </button>
+                </form>
+            </div>
+
+            <div id="frameResults" class="frame-results" style="display: none;">
+                <h3><i class="material-icons">collections</i> 抽帧结果</h3>
+                <div class="frames-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 图片预览模态框 -->
+    <div id="imageModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <img id="modalImage" src="" alt="预览图片">
+        </div>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/frames.js"></script>
+</body>
+</html> 

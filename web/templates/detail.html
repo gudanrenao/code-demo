@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{.title}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="app-header">
+            <h1><i class="material-icons">description</i> 任务详情</h1>
+            <nav class="main-nav">
+                <a href="/tasks" class="nav-link">
+                    <i class="material-icons">list</i>
+                    <span>返回列表</span>
+                </a>
+            </nav>
+        </header>
+
+        <div class="task-detail">
+            <div class="detail-section">
+                <h3><i class="material-icons">info</i> 基本信息</h3>
+                <table class="detail-table">
+                    <tr>
+                        <th>任务ID</th>
+                        <td>{{.taskId}}</td>
+                    </tr>
+                    <tr>
+                        <th>文件名</th>
+                        <td id="filename">-</td>
+                    </tr>
+                    <tr>
+                        <th>状态</th>
+                        <td id="status">-</td>
+                    </tr>
+                    <tr>
+                        <th>创建时间</th>
+                        <td id="createdAt">-</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="detail-section">
+                <h3><i class="material-icons">collections</i> 抽帧结果</h3>
+                <div class="frames-grid" id="frameResults"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const taskId = '{{.taskId}}';
+            
+            // 加载任务信息
+            async function loadTaskInfo() {
+                try {
+                    const response = await fetch(`/api/task/${taskId}`);
+                    const task = await response.json();
+                    
+                    document.getElementById('filename').textContent = task.filename;
+                    document.getElementById('status').textContent = getStatusText(task.status);
+                    document.getElementById('createdAt').textContent = formatDate(task.created_at);
+
+                    if (task.status === 'completed') {
+                        loadFrameResults();
+                    } else if (task.status === 'processing') {
+                        setTimeout(loadTaskInfo, 1000); // 轮询检查状态
+                    }
+                } catch (error) {
+                    console.error('加载任务信息失败:', error);
+                }
+            }
+
+            // 加载抽帧结果
+            async function loadFrameResults() {
+                try {
+                    const response = await fetch(`/api/task/${taskId}/results`);
+                    const frames = await response.json();
+                    
+                    const framesGrid = document.getElementById('frameResults');
+                    framesGrid.innerHTML = frames.map(frame => `
+                        <div class="frame-item">
+                            <img src="/frames/${taskId}/frame_${frame.timestamp}.jpg" alt="Frame" loading="lazy">
+                            <div class="frame-info">
+                                <span>时间: ${frame.timestamp.toFixed(2)}秒</span>
+                            </div>
+                        </div>
+                    `).join('');
+                } catch (error) {
+                    console.error('加载抽帧结果失败:', error);
+                }
+            }
+
+            // 状态文本转换
+            function getStatusText(status) {
+                const statusMap = {
+                    'processing': '处理中',
+                    'completed': '已完成',
+                    'failed': '失败'
+                };
+                return statusMap[status] || status;
+            }
+
+            // 格式化日期
+            function formatDate(dateStr) {
+                const date = new Date(dateStr);
+                return date.toLocaleString('zh-CN', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+            }
+
+            // 初始加载
+            loadTaskInfo();
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{.title}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="app-header">
+            <h1><i class="material-icons">movie</i> 视频检测系统</h1>
+            <nav class="main-nav">
+                <a href="/" class="nav-link">
+                    <i class="material-icons">home</i>
+                    <span>首页</span>
+                </a>
+                <a href="/tasks" class="nav-link">
+                    <i class="material-icons">list</i>
+                    <span>任务列表</span>
+                </a>
+            </nav>
+        </header>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage"></div>
+
+        <div id="frameResults" class="frame-results">
+            <h3><i class="material-icons">collections</i> 抽帧结果</h3>
+            <div class="frames-grid"></div>
+        </div>
+    </div>
+
+    <!-- 图片预览模态框 -->
+    <div id="imageModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <img id="modalImage" src="" alt="预览图片">
+        </div>
+    </div>
+
+    <script src="/static/js/frames.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            showFrameResults('{{.task_id}}');
+        });
+    </script>
+</body>
+</html> 

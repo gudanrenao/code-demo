@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{.title}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="app-header">
+            <h1><i class="material-icons">list</i> 任务列表</h1>
+            <nav class="main-nav">
+                <a href="/" class="nav-link">
+                    <i class="material-icons">home</i>
+                    <span>返回首页</span>
+                </a>
+            </nav>
+        </header>
+
+        <div class="task-list-container">
+            <div class="task-filters">
+                <select id="statusFilter">
+                    <option value="">全部状态</option>
+                    <option value="processing">处理中</option>
+                    <option value="completed">已完成</option>
+                    <option value="failed">失败</option>
+                </select>
+            </div>
+
+            <table class="task-table">
+                <thead>
+                    <tr>
+                        <th>任务ID</th>
+                        <th>文件名</th>
+                        <th>状态</th>
+                        <th>进度</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="taskList">
+                    <!-- 任务列表将通过 JavaScript 动态加载 -->
+                </tbody>
+            </table>
+
+            <div class="pagination">
+                <button id="prevPage" disabled>&lt; 上一页</button>
+                <span id="pageInfo">第 1 页</span>
+                <button id="nextPage">下一页 &gt;</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/tasks.js"></script>
+</body>
+</html> 
