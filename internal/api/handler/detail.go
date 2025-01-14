@@ -18,7 +18,8 @@ func TaskDetail(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "detail.html", gin.H{
-		"title": "任务详情",
-		"task":  task,
+		"title":  "任务详情",
+		"taskId": taskID,
+		"task":   task,
 	})
 }

@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </td>
                     <td>${formatDate(task.created_at)}</td>
                     <td>
-                        <a href="/task/${task.id}" class="button">
+                        <a href="/tasks/${task.id}" class="button">
                             <i class="material-icons">visibility</i>
                             查看详情
                         </a>

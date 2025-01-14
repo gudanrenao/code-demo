@@ -31,12 +31,33 @@
                         <td id="filename">-</td>
                     </tr>
                     <tr>
+                        <th>检测类型</th>
+                        <td id="types">-</td>
+                    </tr>
+                    <tr>
+                        <th>检测参数</th>
+                        <td id="params">-</td>
+                    </tr>
+                    <tr>
                         <th>状态</th>
                         <td id="status">-</td>
                     </tr>
                     <tr>
+                        <th>进度</th>
+                        <td>
+                            <div class="progress-bar">
+                                <div class="progress-bar-inner" id="progress" style="width: 0%"></div>
+                            </div>
+                            <span class="progress-text" id="progressText">0%</span>
+                        </td>
+                    </tr>
+                    <tr>
                         <th>创建时间</th>
                         <td id="createdAt">-</td>
+                    </tr>
+                    <tr>
+                        <th>更新时间</th>
+                        <td id="updatedAt">-</td>
                     </tr>
                 </table>
             </div>
@@ -55,12 +76,17 @@
             // 加载任务信息
             async function loadTaskInfo() {
                 try {
-                    const response = await fetch(`/api/task/${taskId}`);
+                    const response = await fetch(`/api/tasks/${taskId}`);
                     const task = await response.json();
                     
                     document.getElementById('filename').textContent = task.filename;
+                    document.getElementById('types').textContent = formatTypes(task.types);
+                    document.getElementById('params').textContent = formatParams(task.params);
                     document.getElementById('status').textContent = getStatusText(task.status);
+                    document.getElementById('progress').style.width = `${task.progress}%`;
+                    document.getElementById('progressText').textContent = `${task.progress.toFixed(1)}%`;
                     document.getElementById('createdAt').textContent = formatDate(task.created_at);
+                    document.getElementById('updatedAt').textContent = formatDate(task.updated_at);
 
                     if (task.status === 'completed') {
                         loadFrameResults();
@@ -75,15 +101,19 @@
             // 加载抽帧结果
             async function loadFrameResults() {
                 try {
-                    const response = await fetch(`/api/task/${taskId}/results`);
+                    const response = await fetch(`/api/tasks/${taskId}/results`);
                     const frames = await response.json();
                     
                     const framesGrid = document.getElementById('frameResults');
-                    framesGrid.innerHTML = frames.map(frame => `
+                    const results = frames.results || [];
+                    framesGrid.innerHTML = results.map(frame => `
                         <div class="frame-item">
-                            <img src="/frames/${taskId}/frame_${frame.timestamp}.jpg" alt="Frame" loading="lazy">
+                            <img src="/api/frames/${taskId}/frame_${frame.timestamp}_time_${frame.videoTime.toFixed(3)}.${frame.imageFormat || 'jpg'}"
+                                 alt="Frame" 
+                                 loading="lazy"
+                                 ondblclick="showImageModal(this.src)">
                             <div class="frame-info">
-                                <span>时间: ${frame.timestamp.toFixed(2)}秒</span>
+                                <span>时间: ${formatVideoTimestamp(frame.videoTime)}</span>
                             </div>
                         </div>
                     `).join('');
@@ -113,6 +143,37 @@
                     minute: '2-digit',
                     second: '2-digit'
                 });
+            }
+
+            // 添加视频时间戳格式化函数
+            function formatVideoTimestamp(seconds) {
+                const hours = Math.floor(seconds / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                const secs = Math.floor(seconds % 60);
+            
+                if (hours > 0) {
+                    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }
+                return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }
+
+            // 格式化检测类型
+            function formatTypes(types) {
+                if (!types || types.length === 0) return '-';
+                const typeMap = {
+                    'black_screen': '黑屏检测',
+                    'blue_screen': '蓝屏检测',
+                    'green_screen': '绿屏检测'
+                };
+                return types.map(t => typeMap[t] || t).join('、');
+            }
+
+            // 格式化检测参数
+            function formatParams(params) {
+                if (!params || Object.keys(params).length === 0) return '-';
+                return Object.entries(params)
+                    .map(([key, value]) => `${key}: ${value}`)
+                    .join(', ');
             }
 
             // 初始加载
